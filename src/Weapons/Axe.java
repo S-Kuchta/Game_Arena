@@ -10,4 +10,10 @@ public class Axe extends Weapons{
     public int specialAttack() {
         return super.specialAttack();
     }
+
+    @Override
+    public void weaponChooseText() {
+        super.weaponChooseText();
+        System.out.println("Axe = Damage: " + this.weaponDamage + ". Axe attack have " + this.specialWeaponAttackChance + " chance to restore " + this.valueOfSpecialAttack + " attacker health.");
+    }
 }

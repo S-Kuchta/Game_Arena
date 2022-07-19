@@ -10,7 +10,6 @@ public class GameMechanicMethods {
     }
 
     /**
-     *
      * @param attackerManaOrEnergyDrain;
      * @param defenderManaOrEnergy;
      * @param whichStat;
@@ -18,40 +17,44 @@ public class GameMechanicMethods {
      * @return max mana or energy or attackerManaOrEnergyDrain based on entry defender mana or energy amount.
      */
     public int energyAndManaDrain(int attackerManaOrEnergyDrain, int defenderManaOrEnergy, String whichStat) {
-        if (defenderManaOrEnergy < attackerManaOrEnergyDrain) {
-            System.out.print(this.attackerName + " drain " + defenderManaOrEnergy + " " + whichStat + " from " + this.defenderName);
-            System.out.println("\t\t" + this.defenderName + " " + whichStat + " is 0");
-            return defenderManaOrEnergy;
+        if(defenderManaOrEnergy == 0) {
+            return 0;
+        } else if(attackerManaOrEnergyDrain != 0) {
+            if (defenderManaOrEnergy < attackerManaOrEnergyDrain) {
+                System.out.print(this.attackerName + " drain " + defenderManaOrEnergy + " " + whichStat + " from " + this.defenderName);
+                System.out.println("\t\t" + this.defenderName + " " + whichStat + " is 0");
+                return defenderManaOrEnergy;
+            } else {
+                System.out.print(this.attackerName + " drain " + attackerManaOrEnergyDrain + " " + whichStat + " from " + this.defenderName);
+                System.out.println("\t\t" + this.defenderName + " " + whichStat + " is " + (defenderManaOrEnergy - attackerManaOrEnergyDrain) + ".");
+                return attackerManaOrEnergyDrain;
+            }
         } else {
-            System.out.print(this.attackerName + " drain " + attackerManaOrEnergyDrain + " " + whichStat + " from " + this.defenderName);
-            System.out.println("\t\t" + this.defenderName + " " + whichStat + " is " + (defenderManaOrEnergy - attackerManaOrEnergyDrain) + ".");
-            return attackerManaOrEnergyDrain;
+            return 0;
         }
     }
 
     /**
+     * @param attackerMaxHealthOrMana;
+     * @param attackerHealthOrMana;
+     * @param lifeOrManaStealAmount;
      *
-     * @param attackerMaxHealth;
-     * @param attackerHealth;
-     * @param lifeStealAmount;
-     *
-     * @return lifeStealAmount. If attacker missing health are less than lifeStealAmount than return amount of missing health.
+     * @return lifeOrManaStealAmount. If attacker missing health are less than lifeOrManaStealAmount than return amount of missing health.
      */
-    public int healthAndManaRestore(int attackerMaxHealth, int attackerHealth, int lifeStealAmount, String whichStat) {
-        if (attackerMaxHealth - attackerHealth < lifeStealAmount) {
-            System.out.println(this.attackerName + " restore " + (attackerMaxHealth - attackerHealth) + " " + whichStat + ".");
-            return attackerMaxHealth - attackerHealth;
-        } else if(lifeStealAmount == 0) {
+    public int healthAndManaRestore(int attackerMaxHealthOrMana, int attackerHealthOrMana, int lifeOrManaStealAmount, String whichStat) {
+        if (attackerMaxHealthOrMana - attackerHealthOrMana < lifeOrManaStealAmount) {
+            System.out.println(this.attackerName + " restore " + (attackerMaxHealthOrMana - attackerHealthOrMana) + " " + whichStat + ".");
+            return attackerMaxHealthOrMana - attackerHealthOrMana;
+        } else if(lifeOrManaStealAmount == 0) {
             System.out.print("");
             return 0;
         } else {
-            System.out.println(this.attackerName + " restore " + lifeStealAmount + " " + whichStat + ".");
-            return lifeStealAmount;
+            System.out.println(this.attackerName + " restore " + lifeOrManaStealAmount + " " + whichStat + ".");
+            return lifeOrManaStealAmount;
         }
     }
 
     /**
-     *
      * @param attackerCanCastDotStacks;
      * @param attackerDamageOverTime;
      * @param attackerTotalDamageOverTime;
@@ -78,12 +81,49 @@ public class GameMechanicMethods {
                 damageOrHealOverTime[0] = damageOrHealOverTime[1] * attackerDamageOverTime;
             }
         }
+        System.out.println(attackerName + " deal " + damageOrHealOverTime[0] + " damage to " + defenderName + " with damage over time ability.");
         return damageOrHealOverTime;
     }
 
-    public int canCastDot() {
-        return 0;
+    /**
+     * @param totalDamage;
+     * @param totalAbsorb;
+     *
+     * @return damage after absorb or 0 base on defender absorb damage.
+     */
+    public int damageDeal(int totalDamage, int totalAbsorb, boolean isCriticalHit) {
+        int totalDamageAfterAbsorb = totalDamage - totalAbsorb;
+        if (totalDamage > totalAbsorb) {
+            System.out.print(attackerName + " deal: " + totalDamage + " damage.\t\t");
+            System.out.print(defenderName + " absorb " + totalAbsorb + " damage.\t\t");
+            System.out.print(attackerName + " deal " + (totalDamage - totalAbsorb) + " damage after absorbing damage by " + defenderName + "\n");
+        } else {
+            System.out.print(attackerName + " deal " + totalDamage + " damage.\t\t");
+            System.out.print(defenderName + " absorb " + totalDamage + " damage.\t\t");
+            System.out.print(attackerName + " deal 0 damage after absorbing damage by " + defenderName + "\n");
+            totalDamageAfterAbsorb = 0;
+        }
+        if(isCriticalHit) {
+            System.out.println("Critical Hit!");
+        }
+        return totalDamageAfterAbsorb;
     }
 
+    public int absorbDamageBonus(int absorbDamageBonus, int totalDamage, int totalAbsorb) {
+        if (absorbDamageBonus <= totalDamage) {
+            return 0;
+        } else {
+            return totalAbsorb - totalDamage;
+        }
+    }
+
+    public int absorbDamageBonusIncrease(int absorbDamageBonusIncrease) {
+        int maxShieldDamageBonus = 70;
+        if(maxShieldDamageBonus - absorbDamageBonusIncrease <= absorbDamageBonusIncrease) {
+            return maxShieldDamageBonus - absorbDamageBonusIncrease;
+        } else {
+            return absorbDamageBonusIncrease;
+        }
+    }
 
 }
