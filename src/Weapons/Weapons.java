@@ -39,4 +39,6 @@ public class Weapons {
         }
     }
 
+    public void weaponChooseText() {}
+
 }

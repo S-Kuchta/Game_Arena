@@ -2,37 +2,39 @@ package Heroes;
 
 public class Hunter extends Heroes {
     public Hunter(String name) {
-        super(name, 585, 16, 10,7,220,16,160,10,13);
+        super(name, 585, 16, 10,7,0,0,130,10,13);
     }
 
+    private final int absorbDamageBonusIncrease = 20;
+    private final int[] manaCost = {0,0,15,35,40,25};
     @Override
     public void attackTypeText(int finalWeaponDamage) {
-        super.setAbilityName(new String[]{"Normal Shot", "Aimed Shot", "Black Arrow", "Kill Shot", "Counterattack", "Skip"});
+        super.setAbilityName(new String[]{"Skip","Normal Shot", "Aimed Shot", "Black Arrow", "Kill Shot", "Counterattack"});
         super.attackTypeText(finalWeaponDamage);
         for(int i = 0;i<getAbilityName().length;i++) {
             switch(i) {
                 case 0:
-                    System.out.println("Enter 1 = " + getAbilityName()[i] + ". Damage: " + (4 + super.getDamage() + finalWeaponDamage) + "-" + (8 + super.getDamage() + finalWeaponDamage) + ", Energy cost: 12");
-                    System.out.println("\t\t\tNormal weapon attack.");
+                    System.out.println("Enter " + i + " = " + getAbilityName()[i] + " round.");
                     break;
                 case 1:
-                    System.out.println("Enter 2 = " + getAbilityName()[i] + ". Damage: " + (10 + super.getDamage() + super.getSpellDamage() + finalWeaponDamage) + "-" + (16 + super.getDamage() + super.getSpellDamage() + finalWeaponDamage) + ", Energy cost: 20, Mana cost: 15.");
-                    System.out.println("\t\t\tStrong attack.");
+                    System.out.println("Enter " + i + " = " + getAbilityName()[i] + ". Damage: " + (4 + super.getDamage() + finalWeaponDamage) + "-" + (8 + super.getDamage() + finalWeaponDamage) + ".");
+                    System.out.println("\t\t\tNormal weapon attack.");
                     break;
                 case 2:
-                    System.out.println("Enter 3 = " + getAbilityName()[i] + ".Damage: " + (finalWeaponDamage + 5) + ", Damage over time: 19, Mana cost: 35, Mana burn: 20.");
-                    System.out.println("\t\t\t" + getAbilityName()[i] + " ability deal non stackable damage over time, damage will be dealt for 4 rounds. Ability burn 20 mana from enemy after cast.");
+                    System.out.println("Enter " + i + " = " + getAbilityName()[i] + ". Damage: " + (10 + super.getDamage() + super.getSpellDamage() + finalWeaponDamage) + "-" + (16 + super.getDamage() + super.getSpellDamage() + finalWeaponDamage) + ", Mana cost: " + manaCost[i] + ".");
+                    System.out.println("\t\t\tStrong attack.");
                     break;
                 case 3:
-                    System.out.println("Enter 4 = " + getAbilityName()[i] + ". Damage " + (25 + super.getDamage() + super.getSpellDamage() + finalWeaponDamage) + "-" + (32 + super.getDamage() + super.getSpellDamage() + finalWeaponDamage) + ", Energy cost: 40, Mana cost: 40.");
-                    System.out.println("\t\t\t" + getAbilityName()[i] + " ability deal massive damage but it's cost is high. If enemy healths are below 20%, damage is doubled.");
+                    System.out.println("Enter " + i + " = " + getAbilityName()[i] + ".Damage: " + (finalWeaponDamage + 5) + ", Damage over time: " + damage + ", Mana burn: " + spellDamage + ", Mana cost: " + manaCost[i] + ".");
+                    System.out.println("\t\t\t" + getAbilityName()[i] + " ability deal non stackable damage over time, damage will be dealt for 4 rounds. Ability burn mana from enemy after cast.");
                     break;
                 case 4:
-                    System.out.println("Enter 5 = " + getAbilityName()[i] + ". Damage: 20, Absorb damage bonus: 20, Energy cost: 35, Mana cost: 25.");
-                    System.out.println("\t\t\t" + getAbilityName()[i] + " Deal 20 damage and increase Hunter bonus absorb damage by 20. Can be stacked.");
+                    System.out.println("Enter " + i + " = " + getAbilityName()[i] + ". Damage " + (25 + super.getDamage() + super.getSpellDamage() + finalWeaponDamage) + "-" + (32 + super.getDamage() + super.getSpellDamage() + finalWeaponDamage) + ",Mana cost: " + manaCost[i] + ".");
+                    System.out.println("\t\t\t" + getAbilityName()[i] + " ability deal massive damage but it's cost is high. If enemy healths are below 20%, damage is doubled.");
                     break;
                 case 5:
-                    System.out.println("Enter 6 = " + getAbilityName()[i] + " round.");
+                    System.out.println("Enter " + i + " = " + getAbilityName()[i] + ". Damage: " + damage + ", Absorb damage bonus: " + absorbDamageBonusIncrease + ", Mana cost: " + manaCost[i] + ".");
+                    System.out.println("\t\t\t" + getAbilityName()[i] + " Deal damage and increase Hunter bonus absorb damage. Can be stacked.");
                     break;
             }
         }
@@ -47,22 +49,20 @@ public class Hunter extends Heroes {
     @Override
     protected void strongAttack() {
         super.strongAttack();
-        super.setManaCost(10);
-        super.setEnergyCost(20);
         super.setWeaponAttack(true);
         super.setTotalDamage(super.getDamageFromAttackType() + super.getDamage() + super.getSpellDamage());
+        super.setManaCost(manaCost[2]);
     }
-
 
     @Override
     protected void specialAttackAbility1() {
         super.specialAttackAbility1();
-        super.setManaDrain(20);
-        super.setManaCost(35);
-        super.setDamageOverTime(19);
-        super.setCanCastDot(true);
-        super.setTotalDamage(5);
+        super.setCanCastDot(true,false,false);
         super.setWeaponAttack(true);
+        super.setManaDrain(spellDamage);
+        super.setManaCost(manaCost[3]);
+        super.setDamageOverTime(damage,super.getDamageOverTime()[1]);
+        super.setTotalDamage(5);
     }
 
     @Override
@@ -72,17 +72,15 @@ public class Hunter extends Heroes {
         super.setDamageFromAttackType(randomDamageChange + 25);
         super.setTotalDamage(super.getDamageFromAttackType() + super.getDamage() + super.getSpellDamage());
         super.setWeaponAttack(true);
-        super.setManaCost(40);
-        super.setEnergyCost(40);
+        super.setManaCost(manaCost[4]);
     }
 
     @Override
     protected void specialDefendAbility() {
         super.specialDefendAbility();
-        super.setManaCost(25);
-        super.setEnergyCost(35);
-        super.setTotalDamage(20);
-        super.setAbsorbDamageBonusIncrease(20);
+        super.setManaCost(manaCost[5]);
+        super.setTotalDamage(damage);
+        super.setAbsorbDamageBonusIncrease(absorbDamageBonusIncrease);
     }
 
     @Override

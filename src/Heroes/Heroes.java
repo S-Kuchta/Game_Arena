@@ -8,15 +8,16 @@ public class Heroes {
     private String name;
     private int health;
     private int maxHealth;
-    private int damage;
+    protected int damage;
     private int totalDamage;
-    private int spellDamage;
+    protected int spellDamage;
     private boolean lifeSteal;
+    private boolean manaSteal;
     private boolean dotLifeSteal;
-    private int damageOverTime;
-    private int totalDamageOverTime;
+    private int[] damageOverTime = {0,0};
+    private int[] totalDamageOverTime = {0,0};
     private int absorbDamage;
-    private int AbsorbDamageBonus;
+    private int absorbDamageBonus;
     private int absorbDamageBonusIncrease;
     private int energy;
     private int maxEnergy;
@@ -32,19 +33,16 @@ public class Heroes {
     private int damageFromAttackType;
     protected String[] abilityName;
     private boolean weaponAttack;
-    private boolean canCastDot; // if true: Damage over time ability set countDotTick to 0 after cast ability
-    private int countDotTick;
+    private boolean[] canCastDot; // if true: Damage over time ability set countDotTick to 0 after cast ability
+    private int[] countDotTick = {0,0,0};
     private boolean canCastDotStacks; // if true: damage over time ability can stack
-    private int dotStacksCount;
+    private int[] dotStacksCount = {0,0};
     private int whichAbilityWasUsed;
     private int rage;
-    private int maxRage;
     private int rageCost;
-    private int rageGenerate;
 
 
-
-    public Heroes(String name, int health, int damage, int spellDamage, int absorbDamage,int energy,int energyRegeneration,int mana, int manaRegeneration, int criticalHitChance) {
+    public Heroes(String name, int health, int damage, int spellDamage, int absorbDamage, int energy, int energyRegeneration, int mana, int manaRegeneration, int criticalHitChance) {
         this.name = name;
         this.health = health;
         this.maxHealth = health;
@@ -57,11 +55,9 @@ public class Heroes {
         this.mana = mana;
         this.maxMana = mana;
         this.manaRegeneration = manaRegeneration;
-        this.rage = 0;
-        this.maxRage = 100;
         this.criticalHitChance = criticalHitChance;
-
     }
+
 
     public void attackTypeText(int finalWeaponDamage) {
     }
@@ -70,90 +66,97 @@ public class Heroes {
         System.out.println("\nYour next Action:");
         attackTypeText(finalWeaponDamage);
 
-        while(true) {
+        while (true) {
             while (!scanner.hasNextInt()) {
                 scanner.next();
-                System.out.println("Enter valid value. Enter number between 1-6: ");
+                System.out.print("Enter valid value. Enter number between 0-" + (getAbilityName().length - 1) + ": ");
             }
 
             int type = scanner.nextInt();
-            if (type <= 6 && type > 0) {
+            if (type >= 0 && type <= getAbilityName().length) {
                 switch (type) {
-                    case 1:
+                    case 0:
                         this.setWhichAbilityWasUsed(0);
-                        normalAttack();
-//                        criticalHit();
-                        break;
-
-                    case 2:
-                        this.setWhichAbilityWasUsed(1);
-                        strongAttack();
-//                        criticalHit();
-                        break;
-
-                    case 3:
-                        this.setWhichAbilityWasUsed(2);
-                        specialAttackAbility1();
-//                        criticalHit();
-                        break;
-
-                    case 4:
-                        this.setWhichAbilityWasUsed(3);
-                        specialAttackAbility2();
-//                        criticalHit();
-                        break;
-
-                    case 5:
-                        this.setWhichAbilityWasUsed(4);
-                        specialDefendAbility();
-                        break;
-
-                    case 6:
-                        this.setWhichAbilityWasUsed(5);
                         this.setLifeSteal(false);
                         this.setWeaponAttack(false);
-                        this.setCanCastDot(false);
+                        this.setCanCastDot(false,false,false);
                         this.setRageCost(0);
                         this.setTotalDamage(0);
-                        this.setDamageOverTime(0);
+                        this.setDamageOverTime(0,0);
                         this.setEnergyCost(0);
                         this.setManaCost(0);
                         this.setEnergyDrain(0);
                         this.setManaDrain(0);
                         break;
+
+                    case 1:
+                        this.setWhichAbilityWasUsed(1);
+                        normalAttack();
+                        break;
+
+                    case 2:
+                        this.setWhichAbilityWasUsed(2);
+                        strongAttack();
+                        break;
+
+                    case 3:
+                        this.setWhichAbilityWasUsed(3);
+                        specialAttackAbility1();
+                        break;
+
+                    case 4:
+                        this.setWhichAbilityWasUsed(4);
+                        specialAttackAbility2();
+                        break;
+
+                    case 5:
+                        this.setWhichAbilityWasUsed(5);
+                        specialDefendAbility();
+                        break;
                 }
                 break;
             } else {
-                System.out.println("Enter valid value. Enter number between 1-6: ");
+                System.out.print("Enter valid value. Enter number between 0-" + (getAbilityName().length - 1) + ": ");
             }
         }
     }
 
     public boolean criticalHit() {
-        int criticalHit = (int)(Math.random() * 101);
+        int criticalHit = (int) (Math.random() * 101);
         return criticalHit <= this.criticalHitChance;
     }
 
     protected void normalAttack() {
-        int randomDamageChange = (int)(Math.random() * 5);
+        int randomDamageChange = (int) (Math.random() * 5);
         this.setDamageFromAttackType(randomDamageChange + 4);
         this.setTotalDamage(getDamageFromAttackType() + this.damage);
-        this.setEnergyCost(12);
+        this.setLifeSteal(false);
+        this.setWeaponAttack(false);
+        this.setCanCastDotStacks(false);
+        this.setCanCastDot(false,false,false);
+        this.setManaSteal(false);
+        this.setEnergyCost(0);
         this.setRageCost(0);
         this.setManaCost(0);
-        this.setLifeSteal(false);
-        this.setWeaponAttack(true);
+        this.setEnergyDrain(0);
+        this.setManaDrain(0);
     }
 
 
     protected void strongAttack() {
-        int randomDamageChange = (int)(Math.random() * 7);
+        int randomDamageChange = (int) (Math.random() * 7);
         this.setDamageFromAttackType(randomDamageChange + 10);
         this.setTotalDamage(getDamageFromAttackType() + this.damage);
-        this.setEnergyCost(20);
+        this.setLifeSteal(false);
+        this.setWeaponAttack(false);
+        this.setCanCastDotStacks(false);
+        this.setCanCastDot(false,false,false);
+        this.setManaSteal(false);
+        this.setEnergyCost(0);
         this.setRageCost(0);
         this.setManaCost(0);
-        this.setLifeSteal(false);
+        this.setEnergyDrain(0);
+        this.setManaDrain(0);
     }
 
 
@@ -161,45 +164,68 @@ public class Heroes {
         this.setLifeSteal(false);
         this.setWeaponAttack(false);
         this.setCanCastDotStacks(false);
-        this.setCanCastDot(false);
+        this.setCanCastDot(false,false,false);
+        this.setManaSteal(false);
         this.setEnergyCost(0);
-        this.setManaCost(0);
         this.setRageCost(0);
+        this.setManaCost(0);
+        this.setEnergyDrain(0);
+        this.setManaDrain(0);
     }
 
     protected void specialAttackAbility2() {
         this.setLifeSteal(false);
         this.setWeaponAttack(false);
         this.setCanCastDotStacks(false);
-        this.setCanCastDot(false);
+        this.setCanCastDot(false,false,false);
+        this.setManaSteal(false);
         this.setEnergyCost(0);
-        this.setManaCost(0);
         this.setRageCost(0);
+        this.setManaCost(0);
+        this.setEnergyDrain(0);
+        this.setManaDrain(0);
     }
 
     protected void specialDefendAbility() {
         this.setLifeSteal(false);
         this.setWeaponAttack(false);
         this.setCanCastDotStacks(false);
-        this.setCanCastDot(false);
+        this.setCanCastDot(false,false,false);
+        this.setManaSteal(false);
         this.setEnergyCost(0);
-        this.setManaCost(0);
         this.setRageCost(0);
+        this.setManaCost(0);
+        this.setEnergyDrain(0);
+        this.setManaDrain(0);
     }
 
 
     public void manaAndEnergyRegeneration() {
-        if(this.getMaxEnergy() - this.getEnergy() > this.getEnergyRegeneration()) {
+        if (this.getMaxEnergy() - this.getEnergy() > this.getEnergyRegeneration()) {
             this.setEnergy(this.getEnergy() + this.getEnergyRegeneration());
         } else {
             this.setEnergy(this.getMaxEnergy());
         }
 
-         if(this.getMaxMana() - this.getMana() > this.getManaRegeneration()) {
+        if (this.getMaxMana() - this.getMana() > this.getManaRegeneration()) {
             this.setMana(this.getMana() + this.getManaRegeneration());
         } else {
             this.setMana(this.getMaxMana());
         }
+    }
+
+    public void damageAndStatsTakenValue(int damage,int energyDrain, int manaDrain,int absorbDamageBonus) {
+        this.health -= damage;
+        this.energy -= energyDrain;
+        this.mana -= manaDrain;
+        this.absorbDamageBonus = absorbDamageBonus;
+    }
+
+    public void statsRestoreValue(int healthRestore, int energyRestore,int manaRestore, int absorbDamageBonusIncrease) {
+        this.health += healthRestore;
+        this.energy += energyRestore;
+        this.mana += manaRestore;
+        this.absorbDamageBonus += absorbDamageBonusIncrease;
     }
 
     public String getName() {
@@ -258,6 +284,14 @@ public class Heroes {
         this.lifeSteal = lifeSteal;
     }
 
+    public boolean isManaSteal() {
+        return manaSteal;
+    }
+
+    public void setManaSteal(boolean manaSteal) {
+        this.manaSteal = manaSteal;
+    }
+
     public boolean isDotLifeSteal() {
         return dotLifeSteal;
     }
@@ -266,20 +300,20 @@ public class Heroes {
         this.dotLifeSteal = dotLifeSteal;
     }
 
-    public int getDamageOverTime() {
+    public int[] getDamageOverTime() {
         return damageOverTime;
     }
 
-    public void setDamageOverTime(int damageOverTime) {
-        this.damageOverTime = damageOverTime;
+    public void setDamageOverTime(int damageOverTime1, int damageOverTime2) {
+        this.damageOverTime = new int[]{damageOverTime1,damageOverTime2};
     }
 
-    public int getTotalDamageOverTime() {
+    public int[] getTotalDamageOverTime() {
         return totalDamageOverTime;
     }
 
-    public void setTotalDamageOverTime(int totalDamageOverTime) {
-        this.totalDamageOverTime = totalDamageOverTime;
+    public void setTotalDamageOverTime(int totalDamageOverTime1, int totalDamageOverTime2) {
+        this.totalDamageOverTime = new int[]{totalDamageOverTime1,totalDamageOverTime2};
     }
 
     public int getAbsorbDamage() {
@@ -291,11 +325,11 @@ public class Heroes {
     }
 
     public int getAbsorbDamageBonus() {
-        return AbsorbDamageBonus;
+        return absorbDamageBonus;
     }
 
     public void setAbsorbDamageBonus(int absorbDamageBonus) {
-        AbsorbDamageBonus = absorbDamageBonus;
+        this.absorbDamageBonus = absorbDamageBonus;
     }
 
     public int getEnergy() {
@@ -394,13 +428,15 @@ public class Heroes {
         this.damageFromAttackType = damageFromAttackType;
     }
 
-    public int getCountDotTick() {
+    public int[] getCountDotTick() {
         return countDotTick;
     }
 
-    public void setCountDotTick(int countDotTick) {
-        this.countDotTick = countDotTick;
+    public void setCountDotTick(int firstCount, int secondCount, int thirdCount) {
+        this.countDotTick = new int[]{firstCount, secondCount, thirdCount};
     }
+
+
 
     public String[] getAbilityName() {
         return abilityName;
@@ -418,12 +454,12 @@ public class Heroes {
         this.weaponAttack = weaponAttack;
     }
 
-    public boolean isCanCastDot() {
+    public boolean[] isCanCastDot() {
         return canCastDot;
     }
 
-    public void setCanCastDot(boolean canCastDot) {
-        this.canCastDot = canCastDot;
+    public void setCanCastDot(boolean firstValue, boolean secondValue, boolean thirdValue) {
+        this.canCastDot = new boolean[]{firstValue,secondValue,thirdValue};
     }
 
     public boolean isCanCastDotStacks() {
@@ -434,12 +470,12 @@ public class Heroes {
         this.canCastDotStacks = canCastDotStacks;
     }
 
-    public int getDotStacksCount() {
+    public int[] getDotStacksCount() {
         return dotStacksCount;
     }
 
-    public void setDotStacksCount(int dotStacksCount) {
-        this.dotStacksCount = dotStacksCount;
+    public void setDotStacksCount(int dotStacksCount1, int dotStacksCount2) {
+        this.dotStacksCount = new int[]{dotStacksCount1,dotStacksCount2};
     }
 
     public int getAbsorbDamageBonusIncrease() {
@@ -466,27 +502,11 @@ public class Heroes {
         this.rage = rage;
     }
 
-    public int getMaxRage() {
-        return maxRage;
-    }
-
-    public void setMaxRage(int maxRage) {
-        this.maxRage = maxRage;
-    }
-
     public int getRageCost() {
         return rageCost;
     }
 
     public void setRageCost(int rageCost) {
         this.rageCost = rageCost;
-    }
-
-    public int getRageGenerate() {
-        return rageGenerate;
-    }
-
-    public void setRageGenerate(int rageGenerate) {
-        this.rageGenerate = rageGenerate;
     }
 }

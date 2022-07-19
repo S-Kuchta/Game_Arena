@@ -8,9 +8,6 @@ public class Main {
 
         GameMechanic gameMechanic = new GameMechanic();
 
-
-
-
         gameMechanic.playerHero();
         gameMechanic.computerHero();
         gameMechanic.attack();
