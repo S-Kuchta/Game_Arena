@@ -21,11 +21,11 @@ public class GameMechanicMethods {
             return 0;
         } else if(attackerManaOrEnergyDrain != 0) {
             if (defenderManaOrEnergy < attackerManaOrEnergyDrain) {
-                System.out.print(this.attackerName + " drain " + defenderManaOrEnergy + " " + whichStat + " from " + this.defenderName);
+                System.out.print("\t" + this.attackerName + " drain " + defenderManaOrEnergy + " " + whichStat + " from " + this.defenderName);
                 System.out.println("\t\t" + this.defenderName + " " + whichStat + " is 0");
                 return defenderManaOrEnergy;
             } else {
-                System.out.print(this.attackerName + " drain " + attackerManaOrEnergyDrain + " " + whichStat + " from " + this.defenderName);
+                System.out.print("\t" + this.attackerName + " drain " + attackerManaOrEnergyDrain + " " + whichStat + " from " + this.defenderName);
                 System.out.println("\t\t" + this.defenderName + " " + whichStat + " is " + (defenderManaOrEnergy - attackerManaOrEnergyDrain) + ".");
                 return attackerManaOrEnergyDrain;
             }
@@ -43,13 +43,13 @@ public class GameMechanicMethods {
      */
     public int healthAndManaRestore(int attackerMaxHealthOrMana, int attackerHealthOrMana, int lifeOrManaStealAmount, String whichStat) {
         if (attackerMaxHealthOrMana - attackerHealthOrMana < lifeOrManaStealAmount) {
-            System.out.println(this.attackerName + " restore " + (attackerMaxHealthOrMana - attackerHealthOrMana) + " " + whichStat + ".");
+            System.out.println("\t" + this.attackerName + " restore " + (attackerMaxHealthOrMana - attackerHealthOrMana) + " " + whichStat + ".");
             return attackerMaxHealthOrMana - attackerHealthOrMana;
         } else if(lifeOrManaStealAmount == 0) {
             System.out.print("");
             return 0;
         } else {
-            System.out.println(this.attackerName + " restore " + lifeOrManaStealAmount + " " + whichStat + ".");
+            System.out.println("\t" + this.attackerName + " restore " + lifeOrManaStealAmount + " " + whichStat + ".");
             return lifeOrManaStealAmount;
         }
     }
@@ -81,7 +81,7 @@ public class GameMechanicMethods {
                 damageOrHealOverTime[0] = damageOrHealOverTime[1] * attackerDamageOverTime;
             }
         }
-        System.out.println(attackerName + " deal " + damageOrHealOverTime[0] + " damage to " + defenderName + " with damage over time ability.");
+        System.out.println("\t" + attackerName + " deal " + damageOrHealOverTime[0] + " damage to " + defenderName + " with damage over time ability.");
         return damageOrHealOverTime;
     }
 
@@ -93,18 +93,18 @@ public class GameMechanicMethods {
      */
     public int damageDeal(int totalDamage, int totalAbsorb, boolean isCriticalHit) {
         int totalDamageAfterAbsorb = totalDamage - totalAbsorb;
+        if(isCriticalHit) {
+            System.out.println("\n\t\t" + "Critical Hit!");
+        }
         if (totalDamage > totalAbsorb) {
-            System.out.print(attackerName + " deal: " + totalDamage + " damage.\t\t");
+            System.out.print("\t" + attackerName + " deal: " + totalDamage + " damage.\t\t");
             System.out.print(defenderName + " absorb " + totalAbsorb + " damage.\t\t");
             System.out.print(attackerName + " deal " + (totalDamage - totalAbsorb) + " damage after absorbing damage by " + defenderName + "\n");
         } else {
-            System.out.print(attackerName + " deal " + totalDamage + " damage.\t\t");
+            System.out.print("\t" + attackerName + " deal " + totalDamage + " damage.\t\t");
             System.out.print(defenderName + " absorb " + totalDamage + " damage.\t\t");
             System.out.print(attackerName + " deal 0 damage after absorbing damage by " + defenderName + "\n");
             totalDamageAfterAbsorb = 0;
-        }
-        if(isCriticalHit) {
-            System.out.println("Critical Hit!");
         }
         return totalDamageAfterAbsorb;
     }
@@ -117,13 +117,13 @@ public class GameMechanicMethods {
         }
     }
 
-    public int absorbDamageBonusIncrease(int absorbDamageBonusIncrease) {
+    public int absorbDamageBonusIncrease(int absorbDamageBonus,int absorbDamageBonusIncrease) {
         int maxShieldDamageBonus = 70;
-        if(maxShieldDamageBonus - absorbDamageBonusIncrease <= absorbDamageBonusIncrease) {
-            return maxShieldDamageBonus - absorbDamageBonusIncrease;
-        } else {
-            return absorbDamageBonusIncrease;
+        if(maxShieldDamageBonus - absorbDamageBonus <= absorbDamageBonusIncrease) {
+            absorbDamageBonusIncrease = maxShieldDamageBonus - absorbDamageBonus;
         }
+        System.out.println("\t" + attackerName + " increase absorb by " + absorbDamageBonusIncrease);
+        return absorbDamageBonusIncrease;
     }
 
 }

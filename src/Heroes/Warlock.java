@@ -2,7 +2,7 @@ package Heroes;
 
 public class Warlock extends Heroes{
     public Warlock(String name) {
-        super(name, 510, 2, 32, 3, 0, 0, 410, 22, 10);
+        super(name, 510, 2, 32, 3, 0, 0, 410, 22, 7);
     }
 
 
@@ -79,7 +79,6 @@ public class Warlock extends Heroes{
     protected void specialAttackAbility2() {
         super.specialAttackAbility2();
         super.setDotLifeSteal(true);
-
         super.setCanCastDot(true,false,false);
         super.setCanCastDotStacks(true);
         super.setManaCost(manaCost[4]);

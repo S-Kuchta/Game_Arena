@@ -101,6 +101,13 @@ public class Warrior extends Heroes {
     }
 
     @Override
+    public void statsText() {
+        System.out.print("\n\n\n\t" + this.getName() + "\t\tHealths: " + this.getHealth()
+                + "\t\tRage: " + this.getRage()
+                + "\t\t Bonus absorb shield: " + this.getAbsorbDamageBonus() + "\n\n");
+    }
+
+    @Override
     public void manaAndEnergyRegeneration() {
         super.manaAndEnergyRegeneration();
     }

@@ -6,7 +6,7 @@ public class Paladin extends Heroes {
     }
 
 
-    private final int[] manaCost = {0,0,25,45,40,40};
+    private final int[] manaCost = {0,0,25,55,40,40};
     @Override
     public void attackTypeText(int finalWeaponDamage) {
         super.setAbilityName(new String[]{"Skip","Normal Attack", "Divine Storm", "Holy Shock", "Flash Heal", "Holy Shield"});
@@ -17,15 +17,15 @@ public class Paladin extends Heroes {
                     System.out.println("Enter " + i + " = " + getAbilityName()[i] + " round.");
                     break;
                 case 1:
-                    System.out.println("Enter " + i + " = " + getAbilityName()[i] + ". Damage: " + (4 + super.getDamage() + finalWeaponDamage) + "-" + (8 + super.getDamage() + finalWeaponDamage) + ".");
+                    System.out.println("Enter " + i + " = " + getAbilityName()[i] + ". Damage: " + (4 + damage + finalWeaponDamage) + "-" + (8 + damage + finalWeaponDamage) + ".");
                     System.out.println("\t\t\tNormal weapon attack.");
                     break;
                 case 2:
-                    System.out.println("Enter " + i + " = " + getAbilityName()[i] + ". Damage: " + (10 + super.getDamage() + finalWeaponDamage) + "-" + (16 + super.getDamage() + finalWeaponDamage) + ", Mana cost: " + manaCost[i] + ".");
-                    System.out.println("\t\t\tStrong weapon attack.");
+                    System.out.println("Enter " + i + " = " + getAbilityName()[i] + ". Damage: " + (10 + damage + finalWeaponDamage + (this.spellDamage / 2)) + "-" + (16 + damage + finalWeaponDamage + (spellDamage / 2)) + ", Mana cost: " + manaCost[i] + ".");
+                    System.out.println("\t\t\tStrong attack.");
                     break;
                 case 3:
-                    System.out.println("Enter " + i + " = " + getAbilityName()[i] + ". Damage: " + (22 + super.getSpellDamage() + finalWeaponDamage) + "-" + (31 + super.getSpellDamage() + finalWeaponDamage) + ", Damage over time: " + (spellDamage/2) +", Mana Cost: " + manaCost[i] + ".");
+                    System.out.println("Enter " + i + " = " + getAbilityName()[i] + ". Damage: " + (22 + spellDamage + finalWeaponDamage) + "-" + (31 + spellDamage + finalWeaponDamage) + ", Damage over time: " + (spellDamage/2) +", Mana Cost: " + manaCost[i] + ".");
                     System.out.println("\t\t\t" + getAbilityName()[i] + " ability deal holy damage. Additional deal damage over time, damage will be dealt for 4 rounds.");
                     break;
                 case 4:
@@ -51,6 +51,7 @@ public class Paladin extends Heroes {
     protected void strongAttack() {
         super.strongAttack();
         super.setWeaponAttack(true);
+        super.setTotalDamage(super.getDamageFromAttackType() + (this.spellDamage / 2) + damage);
         super.setManaCost(manaCost[2]);
     }
 
@@ -87,16 +88,30 @@ public class Paladin extends Heroes {
         paladinHealAndStacks[1] = defenderTotalDamage;
         paladinHealAndStacks[2] = defenderStacks;
 
-            if (paladinHealAndStacks[2] <= 2) {
-                paladinHealAndStacks[2] = 0;
-                paladinHealAndStacks[1] = 0;
-            } else if (paladinHealAndStacks[2] == 3) {
-                paladinHealAndStacks[2] -= 2;
+        if(paladinHealAndStacks[2] <= 1) {
+            paladinHealAndStacks[1] = 0;
+            paladinHealAndStacks[2] = 0;
+        } else {
+            if(paladinHealAndStacks[2] == 2) {
+                paladinHealAndStacks[1] /= 2;
+            } else if(paladinHealAndStacks[2] == 3) {
                 paladinHealAndStacks[1] /= 3;
             } else {
-                paladinHealAndStacks[2] -= 2;
-                paladinHealAndStacks[1] /= 2;
+                paladinHealAndStacks[1] /= 4;
             }
+            paladinHealAndStacks[2]--;
+        }
+
+//            if (paladinHealAndStacks[2] <= 1) {
+//                paladinHealAndStacks[2] = 0;
+//                paladinHealAndStacks[1] = 0;
+//            } else if (paladinHealAndStacks[2] == 2) {
+//                paladinHealAndStacks[2] -= 1;
+//                paladinHealAndStacks[1] /= 2;
+//            } else {
+//                paladinHealAndStacks[2] -= 1;
+//                paladinHealAndStacks[1] /= 2;
+//            }
 
             if (super.getMaxHealth() - attackerHealth > super.getSpellDamage()) {
                 System.out.println(attackerName + " self healed for " + super.getSpellDamage());

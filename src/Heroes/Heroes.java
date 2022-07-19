@@ -62,9 +62,8 @@ public class Heroes {
     public void attackTypeText(int finalWeaponDamage) {
     }
 
-    public void attackType(int finalWeaponDamage) {
+    public void attackType() {
         System.out.println("\nYour next Action:");
-        attackTypeText(finalWeaponDamage);
 
         while (true) {
             while (!scanner.hasNextInt()) {
@@ -72,7 +71,7 @@ public class Heroes {
                 System.out.print("Enter valid value. Enter number between 0-" + (getAbilityName().length - 1) + ": ");
             }
 
-            int type = scanner.nextInt();
+            type = scanner.nextInt();
             if (type >= 0 && type <= getAbilityName().length) {
                 switch (type) {
                     case 0:
@@ -226,6 +225,13 @@ public class Heroes {
         this.energy += energyRestore;
         this.mana += manaRestore;
         this.absorbDamageBonus += absorbDamageBonusIncrease;
+    }
+
+    public void statsText() {
+        System.out.println("\n\n\n\t" + this.getClass().getSimpleName() + " " + this.getName() + " turn: \n");
+        System.out.print(this.getName() + "\t\tHealths: " + this.getHealth()
+                + "\t\tMana: " + this.getMana()
+                + "\t\t Bonus absorb shield: " + this.getAbsorbDamageBonus() + "\n\n");
     }
 
     public String getName() {
