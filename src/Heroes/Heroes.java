@@ -52,6 +52,9 @@ public class Heroes {
     public final String colorReset = "\u001B[0m";
     public final String colorBlue = "\u001B[34m";
     public final String colorGreen = "\033[0;32m";
+    protected int defenderHealth;
+    protected int defenderMaxHealth;
+    protected int[] defenderDotStacks = {0,0};
 
     public Heroes(String name, int health, int damage, int spellDamage, int absorbDamage, int energy, int energyRegeneration, int mana, int manaRegeneration, int criticalHitChance) {
         this.name = name;
@@ -79,7 +82,6 @@ public class Heroes {
         int type;
         while (true) {
             if (computerPlay) {
-//                type = ((int) (Math.random() * getAbilityName().length + 1));
                     type = computerHeroAutoAttack();
 
             } else {
@@ -128,15 +130,21 @@ public class Heroes {
         return criticalHit <= this.criticalHitChance;
     }
 
-    protected int attackChanceCalculator(int percentageChance,int abilityCast) {
+    protected int attackChanceCalculator(int percentageChance1,int abilityCast1, int percentageChance2, int abilityCast2, int percentageChance3, int abilityCast3,int percentageChance4, int abilityCast4) {
         int percentage = (int) (Math.random() * 101);
         int abilityCasted;
-        if(percentage < percentageChance) {
-            abilityCasted = abilityCast;
+        if(percentage <= percentageChance1) {
+            abilityCasted = abilityCast1;
+        } else if(percentage <= (percentageChance1 + percentageChance2) ) {
+            abilityCasted = abilityCast2;
+        } else if(percentage <= (percentageChance1 + percentageChance2 + percentageChance3)) {
+            abilityCasted = abilityCast3;
+        } else if(percentage <= (percentageChance1 + percentageChance2 + percentageChance3 + percentageChance4)) {
+            abilityCasted = abilityCast4;
         } else {
             while(true) {
                 abilityCasted = (int)(Math.random() * getAbilityName().length) + 1;
-                if(abilityCasted == abilityCast) {
+                if(abilityCasted == abilityCast1) {
                     continue;
                 }
                 break;
@@ -218,6 +226,10 @@ public class Heroes {
         this.setManaDrain(0);
     }
 
+    protected void absorbDamageIncrease(int absorbDamageBonusIncrease) {
+        this.setAbsorbDamageBonus(absorbDamageBonusIncrease);
+    }
+
 
     public void manaAndEnergyRegeneration() {
         if (this.getMaxEnergy() - this.getEnergy() > this.getEnergyRegeneration()) {
@@ -240,11 +252,10 @@ public class Heroes {
         this.absorbDamageBonus = absorbDamageBonus;
     }
 
-    public void statsRestoreValue(int healthRestore, int energyRestore, int manaRestore, int absorbDamageBonusIncrease) {
+    public void statsRestoreValue(int healthRestore, int energyRestore, int manaRestore) {
         this.health += healthRestore;
         this.energy += energyRestore;
         this.mana += manaRestore;
-        this.absorbDamageBonus += absorbDamageBonusIncrease;
     }
 
     public void statsText() {
@@ -546,4 +557,27 @@ public class Heroes {
         this.rageCost = rageCost;
     }
 
+    public int getDefenderHealth() {
+        return defenderHealth;
+    }
+
+    public void setDefenderHealth(int defenderHealth) {
+        this.defenderHealth = defenderHealth;
+    }
+
+    public int getDefenderMaxHealth() {
+        return defenderMaxHealth;
+    }
+
+    public void setDefenderMaxHealth(int defenderMaxHealth) {
+        this.defenderMaxHealth = defenderMaxHealth;
+    }
+
+    public int[] getDefenderDotStacks() {
+        return defenderDotStacks;
+    }
+
+    public void setDefenderDotStacks(int defenderDotStacks1,int defenderDotStacks2) {
+        this.defenderDotStacks = new int[]{defenderDotStacks1,defenderDotStacks2};
+    }
 }

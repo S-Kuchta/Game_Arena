@@ -6,7 +6,7 @@ public class Warlock extends Heroes {
     }
 
 
-    private final int[] manaCost = {0, 45, 65, 45, 25};
+    private final int[] manaCost = {0, 45, 65, 45, 35};
 
     @Override
     public void attackTypeText(int finalWeaponDamage, boolean computerPlay) {
@@ -41,7 +41,7 @@ public class Warlock extends Heroes {
                         break;
                     case 4:
                         System.out.println("Enter " + (i + 1) + " = " + getAbilityName()[i]
-                                + " Absorb damage bonus: " + colorCyan + spellDamage + colorReset
+                                + " Absorb damage bonus: " + colorCyan + (spellDamage * 2) + colorReset
                                 + ", Mana cost: " + colorBlueBright + manaCost[i] + colorReset + ".");
                         System.out.println("\t\t\t" + getAbilityName()[i] + " increase absorb damage. Can be stacked. Last until is not destroyed. When shield is destroyed, burn attacker mana equal of absorb shield.");
                         break;
@@ -97,8 +97,8 @@ public class Warlock extends Heroes {
     @Override
     protected void specialDefendAbility() {
         super.specialDefendAbility();
+        super.absorbDamageIncrease(spellDamage * 2);
         super.setManaCost(manaCost[4]);
-        this.setAbsorbDamageBonusIncrease(spellDamage);
     }
 
     public int manaDrainFromShield(int attackerMana, String attackerName, String defenderName) {
@@ -114,15 +114,32 @@ public class Warlock extends Heroes {
 
     @Override
     protected int computerHeroAutoAttack() {
-        int abilityCasted = 2;
-        if (super.getDotStacksCount()[0] < 4) {
-            abilityCasted = super.attackChanceCalculator(80, 4);
-        } else if(super.getDotStacksCount()[0] == 4) {
-            abilityCasted = super.attackChanceCalculator(80,3);
-        } else if(super.getHealth() < super.getMaxHealth() / 2) {
-             abilityCasted = super.attackChanceCalculator(30,5);
-        }  else if (super.getMana() < 60) {
-            abilityCasted = super.attackChanceCalculator(70, 1);
+        int abilityCasted = 1;
+        if (super.getMana() <= manaCost[1]) {
+            abilityCasted = super.attackChanceCalculator(100, 1, 0, 0, 0, 0, 0, 0);
+        } else {
+            if (super.getHealth() > (super.getMaxHealth() / 2)) {
+                if (super.getDotStacksCount()[0] == 4) {
+                    abilityCasted = super.attackChanceCalculator(90, 3, 5, 2, 3, 5, 2, 1);
+                }
+                if (super.getDotStacksCount()[0] < 4) {
+                    abilityCasted = super.attackChanceCalculator(95, 4, 4, 2, 1, 1, 0, 0);
+                }
+                if (super.getMana() > (super.getMaxMana() / 2) && super.getDotStacksCount()[0] == 4) {
+                    abilityCasted = super.attackChanceCalculator(90, 2, 5, 1, 5, 5, 0, 0);
+                }
+                if (super.getDotStacksCount()[0] == 4 && super.getCountDotTick()[0] >= 3) {
+                    abilityCasted = super.attackChanceCalculator(100, 3, 0, 0, 0, 0, 0, 0);
+                }
+            } else {
+                abilityCasted = super.attackChanceCalculator(80, 2, 20, 5, 0, 0, 0, 0);
+                if (super.getDotStacksCount()[0] == 4) {
+                    abilityCasted = super.attackChanceCalculator(90, 3, 5, 2, 3, 5, 2, 1);
+                }
+                if (super.getDotStacksCount()[0] < 4) {
+                    abilityCasted = super.attackChanceCalculator(90, 4, 9, 2, 1, 1, 0, 0);
+                }
+            }
         }
         return abilityCasted;
     }

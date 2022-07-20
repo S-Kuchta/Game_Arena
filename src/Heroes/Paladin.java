@@ -2,7 +2,7 @@ package Heroes;
 
 public class Paladin extends Heroes {
     public Paladin(String name) {
-        super(name, 820, 8, 17,12,0,0,230,14,5);
+        super(name, 820, 8, 17,12,0,0,330,14,5);
     }
 
 
@@ -39,7 +39,7 @@ public class Paladin extends Heroes {
                         break;
                     case 4:
                         System.out.println("Enter " + (i+1) + " = " + getAbilityName()[i]
-                                + ". Absorb damage bonus: " + colorCyan +  (spellDamage * 2) + colorReset
+                                + ". Absorb damage bonus: " + colorCyan +  ((spellDamage * 2) + damage) + colorReset
                                 + ", Mana cost: " + colorBlueBright + manaCost[i] + colorReset + ".");
                         System.out.println("\t\t\t" + getAbilityName()[i] + " increase absorb damage. Can be stacked.");
                         break;
@@ -87,10 +87,10 @@ public class Paladin extends Heroes {
     protected void specialDefendAbility() {
         super.specialDefendAbility();
         super.setManaCost(manaCost[4]);
-        super.setAbsorbDamageBonusIncrease(spellDamage * 2);
+        super.absorbDamageIncrease((spellDamage * 2) + damage);
     }
 
-    public int[] paladinHealAndCleanse(int attackerHealth, int defenderTotalDamage, int defenderStacks, String attackerName) {
+    public int[] healAndCleanse(int attackerHealth, int defenderTotalDamage, int defenderStacks) {
         int[] paladinHealAndStacks = new int[3];
         paladinHealAndStacks[0] = attackerHealth;
         if(defenderStacks != 0) {
@@ -101,11 +101,31 @@ public class Paladin extends Heroes {
         }
 
             if (super.getMaxHealth() - attackerHealth > super.getSpellDamage()) {
-                paladinHealAndStacks[0] = spellDamage;
+                paladinHealAndStacks[0] = spellDamage * 2;
             } else {
                 paladinHealAndStacks[0] = super.getMaxHealth() - attackerHealth;
             }
             return paladinHealAndStacks;
+    }
+
+    @Override
+    protected int computerHeroAutoAttack() {
+        int abilityCasted;
+        if(super.getMana() < 60) {
+            abilityCasted = super.attackChanceCalculator(100,1,0,0,0,0,0,0);
+        } else if(super.getHealth() > (super.getMaxHealth() / 2)) {
+            if(super.getCountDotTick()[0] >= 3 || super.getCountDotTick()[0] == 0) {
+                abilityCasted = super.attackChanceCalculator(80,3,10,2,5,1,5,5);
+            } else {
+                abilityCasted = super.attackChanceCalculator(60,2,30,1,10,3,0,0);
+            }
+            if(super.getDefenderDotStacks()[0] > 2 || super.getDefenderDotStacks()[1] > 2) {
+                abilityCasted = super.attackChanceCalculator(50,4,30,2,15,3,5,1);
+            }
+        } else  {
+            abilityCasted = super.attackChanceCalculator(35,2,15,3,20,5,30,4);
+        }
+        return abilityCasted;
     }
 
     @Override

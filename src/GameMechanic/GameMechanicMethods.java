@@ -25,12 +25,10 @@ public class GameMechanicMethods {
             return 0;
         } else if (attackerManaOrEnergyDrain != 0) {
             if (defenderManaOrEnergy < attackerManaOrEnergyDrain) {
-                System.out.print("\t" + this.attackerName + " drain " + defenderManaOrEnergy + " " + whichStat + " from " + this.defenderName);
-                System.out.println("\t\t" + this.defenderName + " " + whichStat + " is 0");
+                System.out.println("\t" + this.attackerName + " drain " + defenderManaOrEnergy + " " + whichStat + " from " + this.defenderName);
                 return defenderManaOrEnergy;
             } else {
-                System.out.print("\t" + this.attackerName + " drain " + attackerManaOrEnergyDrain + " " + whichStat + " from " + this.defenderName);
-                System.out.println("\t\t" + this.defenderName + " " + whichStat + " is " + (defenderManaOrEnergy - attackerManaOrEnergyDrain) + ".");
+                System.out.println("\t" + this.attackerName + " drain " + heroes.colorBlue + attackerManaOrEnergyDrain + heroes.colorReset + " " + whichStat + " from " + this.defenderName + ".");
                 return attackerManaOrEnergyDrain;
             }
         } else {
@@ -93,7 +91,10 @@ public class GameMechanicMethods {
         return damageOrHealOverTime;
     }
 
-    public void damageOverTimeTextOutput(int damageDeal, String abilityName) {
+    public void damageOverTimeTextOutput(int damageDeal, String abilityName, boolean isCriticalHit) {
+        if(isCriticalHit &&damageDeal != 0) {
+            System.out.println("\t\t" + heroes.colorYellow + "Critical Hit with " + abilityName + heroes.colorReset + "!");
+        }
         if(damageDeal != 0) {
             System.out.println("\t" + attackerName + " deal " + heroes.colorRed + damageDeal + heroes.colorReset + " damage to " + defenderName + " with " + abilityName + ".");
         }
@@ -104,11 +105,8 @@ public class GameMechanicMethods {
      * @param totalAbsorb;
      * @return damage after absorb or 0 base on defender absorb damage.
      */
-    public int damageDeal(int totalDamage, int totalAbsorb, boolean isCriticalHit, int damageDeal) {
+    public int damageDeal(int totalDamage, int totalAbsorb) {
         int totalDamageAfterAbsorb = totalDamage - totalAbsorb;
-        if (isCriticalHit && damageDeal != 0) {
-            System.out.println("\n\t\t" + "Critical Hit!");
-        }
         if (totalDamage > totalAbsorb) {
             System.out.print("\t" + attackerName + " deal " + heroes.colorRedBright + totalDamage + heroes.colorReset + " damage.\t\t" +
                     defenderName + " absorb " + heroes.colorCyan + totalAbsorb + heroes.colorReset + " damage.\t\t" +
@@ -125,18 +123,11 @@ public class GameMechanicMethods {
     public int absorbDamageBonus(int absorbDamageBonus, int totalDamage, int totalAbsorb) {
         if (absorbDamageBonus <= totalDamage) {
             return 0;
+        } else if(totalDamage == 0) {
+            return absorbDamageBonus;
         } else {
             return totalAbsorb - totalDamage;
         }
-    }
-
-    public int absorbDamageBonusIncrease(int absorbDamageBonus, int absorbDamageBonusIncrease) {
-        int maxShieldDamageBonus = 70;
-        if (maxShieldDamageBonus - absorbDamageBonus <= absorbDamageBonusIncrease) {
-            absorbDamageBonusIncrease = maxShieldDamageBonus - absorbDamageBonus;
-        }
-        System.out.println("\t" + attackerName + " increase absorb by " + absorbDamageBonusIncrease);
-        return absorbDamageBonusIncrease;
     }
 
 }
