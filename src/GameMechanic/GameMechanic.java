@@ -23,6 +23,8 @@ public class GameMechanic {
     private String name;
     private Weapons playerWeapon;
     private Weapons computerWeapon;
+    private boolean computerPlay;
+    private boolean attacked = true;
 
     private final Heroes[] heroes = {getHunter(), getWarrior(), getPaladin(), getWarlock()};
     private Weapons[] weapons;
@@ -84,21 +86,26 @@ public class GameMechanic {
     }
 
     private void validValueHeroText() {
-        System.out.print("Enter valid value. Enter number between 1-" + heroes.length + ": ");
+        System.out.println("Enter valid value. Enter number between 1-" + heroes.length + ": ");
     }
-
     private void validValueWeaponText() {
-        System.out.print("Enter valid value. Enter number between 1-" + weapons.length + ": ");
+        System.out.println("Enter valid value. Enter number between 1-" + weapons.length + ": ");
     }
 
-    private Heroes heroesChoose() {
-        heroChooseText();
+    private Heroes heroesChoose(boolean computerPlay) {
+        int heroSet;
         while (true) {
+        if(computerPlay) {
+            heroSet = ((int)(Math.random() * heroes.length + 1));
+            heroSet = 2;
+        } else {
+            heroChooseText();
             while (!scanner.hasNextInt()) {
                 scanner.next();
                 validValueHeroText();
             }
-            int heroSet = scanner.nextInt();
+            heroSet = scanner.nextInt();
+        }
             if (heroSet > 0 && heroSet <= heroes.length) {
                 switch (heroSet) {
                     case 1:
@@ -127,13 +134,19 @@ public class GameMechanic {
             setWeapons(new Weapons[]{getSword(), getAxe(), getMace()});
         }
 
-        weaponChooseText();
         while (true) {
-            while (!scanner.hasNextInt()) {
-                scanner.next();
-                validValueWeaponText();
+            int weaponSet;
+            if(computerPlay) {
+                weaponSet = ((int)(Math.random() * weapons.length + 1));
+            } else {
+                weaponChooseText();
+                while (!scanner.hasNextInt()) {
+                    scanner.next();
+                    validValueWeaponText();
+                }
+                weaponSet = scanner.nextInt();
             }
-            int weaponSet = scanner.nextInt();
+
             if (weaponSet >= 1 && weaponSet <= weapons.length) {
                 switch (weaponSet) {
                     case 1:
@@ -157,33 +170,54 @@ public class GameMechanic {
         return null;
     }
 
+    public void computerChosenHeroAndWeapon() {
+        System.out.println("\tComputer hero is " + computerHero.getClass().getSimpleName() + ".");
+        System.out.println("\tComputer weapon is " + computerWeapon.getClass().getSimpleName() + ".");
+    }
+
     public void playerHero() {
         System.out.print("\n\tEnter player 1 name: ");
         name = scanner.next();
         System.out.println("\nChoose " + name + " hero: ");
-        playerHero = heroesChoose();
+        playerHero = heroesChoose(false);
         playerWeapon = weaponChoose(playerHero);
     }
 
-    public void computerHero() {
+    public void computerHero(boolean computerPlay) {
+        this.computerPlay = computerPlay;
         System.out.print("\n\tEnter player 2 name: ");
         name = scanner.next();
-        System.out.println("\nChoose " + name + " hero: ");
-        computerHero = heroesChoose();
+        if(!computerPlay) {
+            System.out.println("\nChoose " + name + " hero: ");
+        }
+        computerHero = heroesChoose(computerPlay);
         computerWeapon = weaponChoose(computerHero);
+        computerChosenHeroAndWeapon();
     }
 
-    private void playerDamageDeal(Heroes attacker, Heroes defender, Weapons weapon) {
+    private void playerDamageDeal(Heroes attacker, Heroes defender, Weapons weapon, boolean computerPlay) {
         GameMechanicMethods gameMechanicMethods = new GameMechanicMethods(attacker.getName(), defender.getName());
 
-
         while (true) {
-            attacker.statsText();
-            attacker.attackTypeText(weapon.getFinalWeaponDamage());
-            attacker.attackType();
+
+
+            if(this.attacked) {
+                System.out.println("\n\t");
+                System.out.println(attacker.colorYellow + "\t\t\t" + attacker.getClass().getSimpleName() + " " + attacker.getName() + " turn: \n" + attacker.colorReset);
+            }
+
+            if(!computerPlay) {
+                System.out.print("\tYour stats: ");
+                attacker.statsText();
+                System.out.print("\tEnemy stats: ");
+                defender.statsText();
+                System.out.print("\n");
+            }
+
+            attacker.attackTypeText(weapon.getFinalWeaponDamage(),computerPlay);
+            attacker.attackType(computerPlay);
 
             if (attacker.getEnergy() >= attacker.getEnergyCost() && attacker.getMana() >= attacker.getManaCost() && attacker.getRage() >= attacker.getRageCost()) {
-                System.out.println("\n\t\t" + attacker.getName() + " use ability " + attacker.getAbilityName()[attacker.getWhichAbilityWasUsed()] + "");
 
                 attacker.setMana(attacker.getMana() - attacker.getManaCost());
                 attacker.setEnergy(attacker.getEnergy() - attacker.getEnergyCost());
@@ -191,10 +225,11 @@ public class GameMechanic {
 
                 //damage
                 int totalDamage = attacker.getTotalDamage();
-                int totalDamageAfterAbsorb = 0;
+                int totalDamageAfterAbsorb /*= 0*/;
                 int totalAbsorb = defender.getAbsorbDamage() + defender.getAbsorbDamageBonus();
                 int absorbDamageBonus = defender.getAbsorbDamageBonus();
                 int absorbDamageBonusIncrease = attacker.getAbsorbDamageBonusIncrease();
+                int weaponDamage = 0;
 
                 //damage over time
                 int[] totalDamageOverTime = {attacker.getTotalDamageOverTime()[0], attacker.getTotalDamageOverTime()[1]};
@@ -214,6 +249,10 @@ public class GameMechanic {
                 int[] dotCountTick = {attacker.getCountDotTick()[0], attacker.getCountDotTick()[1], attacker.getCountDotTick()[2]};
                 boolean[] canCastDot = {attacker.isCanCastDot()[0], attacker.isCanCastDot()[1], attacker.isCanCastDot()[2]};
 
+                //ability used
+                String abilityUsed = attacker.getAbilityName()[attacker.getWhichAbilityWasUsed() - 1];
+                System.out.println("\t\t" + attacker.getName() + " use ability " + attacker.colorYellow + abilityUsed + attacker.colorReset + "");
+
                 //Critical hit double total damage.
                 boolean isCriticalHit = attacker.criticalHit();
                 if (isCriticalHit) {
@@ -229,11 +268,13 @@ public class GameMechanic {
                 }
 
                 //Paladin heal
-                if (attacker instanceof Paladin && attacker.getWhichAbilityWasUsed() == 3) {
+                if (attacker instanceof Paladin && attacker.getWhichAbilityWasUsed() == 4) {
                     int[] paladinHealAndCleanse = ((Paladin) attacker).paladinHealAndCleanse(attacker.getHealth(), defender.getTotalDamageOverTime()[0], defender.getDotStacksCount()[0], attacker.getName());
+                    int[] paladinHealAndCleanse1 = ((Paladin) attacker).paladinHealAndCleanse(attacker.getHealth(), defender.getTotalDamageOverTime()[1], defender.getDotStacksCount()[1], attacker.getName());
                     healthRestore += paladinHealAndCleanse[0];
-                    defender.setTotalDamageOverTime((defender.getTotalDamageOverTime()[0] - paladinHealAndCleanse[1]), (defender.getTotalDamageOverTime()[1] - paladinHealAndCleanse[1]));
+                    defender.setTotalDamageOverTime((defender.getTotalDamageOverTime()[0] - paladinHealAndCleanse[1]), (defender.getTotalDamageOverTime()[1] - paladinHealAndCleanse1[1]));
                     defender.setDotStacksCount(paladinHealAndCleanse[2], paladinHealAndCleanse[2]);
+
                 }
 
                 //Damage over time
@@ -257,16 +298,19 @@ public class GameMechanic {
                     dotCountTick[1]++;
                 }
 
+                totalDamage += totalDamageOverTime[0] + totalDamageOverTime[1];
+
                 //Damage dealt
-                if (totalDamage != 0) {
                 if (attacker.isWeaponAttack()) {
                     totalDamage += weapon.getFinalWeaponDamage();
+                    weaponDamage += weapon.getFinalWeaponDamage();
 
                     //Weapon special attack
                     int weaponStats = weapon.specialAttack();
                     if (weapon instanceof Bow) {
                         energyDrain += weaponStats;
                     } else if (weapon instanceof Sword) {
+                        weaponDamage += weaponStats;
                         totalDamage += weaponStats;
                     } else if (weapon instanceof Axe) {
                         healthRestore += weaponStats;
@@ -282,11 +326,15 @@ public class GameMechanic {
                 }
 
                 //defender health calculator
-                totalDamageAfterAbsorb = gameMechanicMethods.damageDeal(totalDamage, totalAbsorb, isCriticalHit);
+                totalDamageAfterAbsorb = gameMechanicMethods.damageDeal(totalDamage, totalAbsorb, isCriticalHit, attacker.getTotalDamage());
+                gameMechanicMethods.damageOverTimeTextOutput(attacker.getTotalDamage(),abilityUsed);
+                gameMechanicMethods.damageOverTimeTextOutput(weaponDamage,weapon.getClass().getSimpleName());
+                gameMechanicMethods.damageOverTimeTextOutput(damageAndStacksOverTime1[0],attacker.getDamageOverTimeAbilityName()[0]);
+                gameMechanicMethods.damageOverTimeTextOutput(damageAndStacksOverTime2[0],attacker.getDamageOverTimeAbilityName()[1]);
 
                 //defender absorb damage calculator
                 absorbDamageBonus = gameMechanicMethods.absorbDamageBonus(absorbDamageBonus, totalDamage, totalAbsorb);
-                }
+
 
                 //life steal
                 if (attacker.isLifeSteal()) {
@@ -320,8 +368,7 @@ public class GameMechanic {
                 energyRestore = gameMechanicMethods.healthAndManaRestore(attacker.getMaxEnergy(), attacker.getEnergy(), energyRestore, "Energy");
 
                 //Stats changer
-                int attackerDamageDeal = totalDamageOverTime[0] + totalDamageOverTime[1] + totalDamageAfterAbsorb;
-                defender.damageAndStatsTakenValue(attackerDamageDeal, energyDrain, manaDrain, absorbDamageBonus);
+                defender.damageAndStatsTakenValue(totalDamageAfterAbsorb, energyDrain, manaDrain, absorbDamageBonus);
                 attacker.statsRestoreValue(healthRestore, energyRestore, manaRestore, absorbDamageBonusIncrease);
 
                 //Damage over time stacks remove after 4 rounds
@@ -332,21 +379,25 @@ public class GameMechanic {
                     }
                 }
 
+                System.out.println("------------------------------------------------------------------------------------------------");
                 attacker.setCountDotTick(dotCountTick[0], dotCountTick[1], dotCountTick[2]);
                 attacker.setTotalDamageOverTime(totalDamageOverTime[0], totalDamageOverTime[1]);
                 attacker.setDotStacksCount(dotStacksCount[0], dotStacksCount[1]);
                 attacker.setDamageOverTime(0, 0);
                 attacker.setTotalDamage(0);
                 attacker.setAbsorbDamageBonusIncrease(0);
-
+                this.attacked = true;
                 break;
             } else {
+                attacked = false;
                 attacker.setManaSteal(false);
                 attacker.setCanCastDot(false, false, false);
                 attacker.setDamageOverTime(0, 0);
                 attacker.setTotalDamage(0);
                 attacker.setAbsorbDamageBonusIncrease(0);
-                System.out.println("You don't have enough energy, mana or rage to perform this action. Try Another action.");
+                if(!computerPlay) {
+                    System.out.println(attacker.colorYellow + "You don't have enough energy, mana or rage to perform this action. Try Another action." + attacker.colorReset);
+                }
             }
         }
     }
@@ -361,7 +412,7 @@ public class GameMechanic {
             if (playerHero.getHealth() <= 0 || computerHero.getHealth() <= 0) {
                 break;
             } else {
-                playerDamageDeal(playerHero, computerHero, playerWeapon);
+                playerDamageDeal(playerHero, computerHero, playerWeapon,false);
                 playerHero.manaAndEnergyRegeneration();
             }
 
@@ -369,7 +420,7 @@ public class GameMechanic {
             if (playerHero.getHealth() <= 0 || computerHero.getHealth() <= 0) {
                 break;
             } else {
-                playerDamageDeal(computerHero, playerHero, computerWeapon);
+                playerDamageDeal(computerHero, playerHero, computerWeapon, computerPlay);
                 computerHero.manaAndEnergyRegeneration();
             }
         }

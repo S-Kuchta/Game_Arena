@@ -32,7 +32,7 @@ public class Weapons {
     public int specialAttack() {
         int randomChance = (int) (Math.random() * 101);
         if (randomChance <= specialWeaponAttackChance) {
-            System.out.println("Special attack with " + getClass().getSimpleName());
+            System.out.println("\t\tSpecial attack with " + getClass().getSimpleName());
             return valueOfSpecialAttack;
         } else {
             return 0;

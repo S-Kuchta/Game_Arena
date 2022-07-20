@@ -2,7 +2,7 @@ package Weapons;
 
 public class Staff extends Weapons{
     public Staff() {
-        super(4,20,25);
+        super(4,100,25);
     }
 
     @Override
