@@ -8,10 +8,12 @@ public class Main {
 
         GameMechanic gameMechanic = new GameMechanic();
 
-        gameMechanic.playerHero();
-        gameMechanic.computerHero();
-        gameMechanic.attack();
 
+        gameMechanic.playerHero();
+        System.out.println("Do you want play against computer? yes/no");
+        String howYouWantToPlay = scanner.nextLine();
+        gameMechanic.computerHero(howYouWantToPlay.equals("yes"));
+        gameMechanic.attack();
 
 
     }
