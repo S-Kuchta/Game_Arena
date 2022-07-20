@@ -3,10 +3,10 @@ package Heroes;
 public class Warrior extends Heroes {
 
     public Warrior(String name) {
-        super(name,780, 19, 0, 10,0,0,0,0,8);
+        super(name,750, 21, 0, 7,0,0,0,0,8);
     }
 
-    private final int absorbDamageBonusIncrease = 25;
+    private final int absorbDamageBonusIncrease = damage * 2;
     private final int[] rageCostWarrior = {0,10,executeRageCostCalculate(),25,0};
 
     @Override
@@ -101,13 +101,14 @@ public class Warrior extends Heroes {
         super.specialDefendAbility();
         super.setRageCost(rageCostWarrior[4]);
         super.setRage(getRage() + rageGenerator(10));
-        super.setAbsorbDamageBonusIncrease(absorbDamageBonusIncrease);
+        super.absorbDamageIncrease(absorbDamageBonusIncrease);
     }
 
     private int rageGenerator(int amountOfRageGenerate) {
         int maxRage = 100;
         return Math.min(maxRage - super.getRage(), amountOfRageGenerate);
     }
+
 
     @Override
     public void statsText() {
@@ -123,25 +124,38 @@ public class Warrior extends Heroes {
 
     @Override
     protected int computerHeroAutoAttack() {
-        int abilityCasted = 0;
-        if (super.getRage() < 30) {
-            abilityCasted = super.attackChanceCalculator(95, 1);
-            System.out.println("1");
-        } else if(super.getRage() == 100) {
-            System.out.println("2");
-            abilityCasted = super.attackChanceCalculator(100,3);
-        } else if(super.getRage() < 60) {
-            System.out.println("3");
-            abilityCasted = super.attackChanceCalculator(60,1);
-        } else if(super.getTotalDamageOverTime()[0] == 0 && super.getCountDotTick()[0] == 0) {
-            System.out.println("4");
-            abilityCasted = super.attackChanceCalculator(70, 4);
-        } else if(super.getHealth() < super.getMaxHealth() / 2) {
-            System.out.println("5");
-            abilityCasted = super.attackChanceCalculator(30,5);
-        } else if (super.getRage() > 60) {
-            System.out.println("6");
-            abilityCasted = super.attackChanceCalculator(90, 3);
+        int abilityCasted = 1;
+
+        if(super.getRage() == 100) {
+            abilityCasted = super.attackChanceCalculator(100,3,0,0,0,0,0,0);
+        }
+        if(super.getDefenderHealth() < (super.getDefenderMaxHealth() / 100) * 20) {
+            abilityCasted = super.attackChanceCalculator(80,3,10,2,10,1,0,0);
+        }
+        if(super.getHealth() <= super.getMaxHealth() / 4) {
+             if (super.getRage() <= 100 && super.getRage() > 80) {
+                abilityCasted = super.attackChanceCalculator(60,3,20,2,10,1,10,5);
+            }
+        } else if(super.getHealth() < (super.getMaxHealth() / 2)) {
+            if(super.getRage() <= 100) {
+                abilityCasted = super.attackChanceCalculator(40,1,30,2,20,3,10,5);
+            }
+            if(super.getRage() > 30 && super.getCountDotTick()[0] == 0 || super.getCountDotTick()[0] >= 3) {
+                abilityCasted = super.attackChanceCalculator(80,4,10,1,10,2,10,5);
+            }
+        } else if(super.getHealth() > (super.getMaxHealth() / 2)) {
+            if(super.getRage() <= 15) {
+                abilityCasted = super.attackChanceCalculator(95,1,5,5,0,0,0,0);
+            }
+            if(super.getRage() <= 30 && super.getRage() > 15) {
+                abilityCasted = super.attackChanceCalculator(85, 1,10,2,5,5,0,0);
+            }
+            if(super.getRage() > 25 && super.getCountDotTick()[0] == 0 ||super.getCountDotTick()[0] >= 3) {
+                abilityCasted = super.attackChanceCalculator(90,4,5,1,5,2,0,0);
+            }
+            if(super.getRage() <= 60) {
+                abilityCasted = super.attackChanceCalculator(70, 1,25,2,5,5,0,0);
+            }
         }
         return abilityCasted;
     }

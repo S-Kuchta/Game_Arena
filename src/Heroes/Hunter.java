@@ -2,11 +2,11 @@ package Heroes;
 
 public class Hunter extends Heroes {
     public Hunter(String name) {
-        super(name, 685, 16, 10,7,0,0,130,10,13);
+        super(name, 685, 24, 11,7,0,0,175,12,13);
     }
 
-    private final int absorbDamageBonusIncrease = 20;
-    private final int[] manaCost = {0,15,35,40,25};
+    private final int absorbDamageBonusIncrease = ((spellDamage * 2) + damage);
+    private final int[] manaCost = {0,17,35,40,25};
     @Override
     public void attackTypeText(int finalWeaponDamage, boolean computerPlay) {
         super.setAbilityName(new String[]{"Ranged Shot", "Aimed Shot", "Black Arrow", "Kill Shot", "Counterattack"});
@@ -91,7 +91,27 @@ public class Hunter extends Heroes {
         super.specialDefendAbility();
         super.setManaCost(manaCost[4]);
         super.setTotalDamage(damage);
-        super.setAbsorbDamageBonusIncrease(absorbDamageBonusIncrease);
+        super.absorbDamageIncrease(absorbDamageBonusIncrease);
+    }
+
+    @Override
+    protected int computerHeroAutoAttack() {
+        int abilityCasted = 1;
+        if(super.getCountDotTick()[0] >= 3 || super.getCountDotTick()[0] == 0) {
+            abilityCasted = super.attackChanceCalculator(80,3,10,2,5,1,5,5);
+        }
+        if(super.getHealth() < (getHealth() / 2)) {
+            abilityCasted = super.attackChanceCalculator(40,5,25,2,25,1,10,3);
+        }
+        if(super.getMana() <= 40) {
+            abilityCasted = super.attackChanceCalculator(100,1,0,0,0,0,0,0);
+        } else if(super.getMana() > 40) {
+            abilityCasted = super.attackChanceCalculator(80,2,5,3,5,5,10,1);
+        }
+        if(super.getDefenderHealth() < (super.getDefenderMaxHealth() / 100) * 20) {
+            abilityCasted = super.attackChanceCalculator(90,4,5,2,5,1,0,0);
+        }
+        return abilityCasted;
     }
 
     @Override

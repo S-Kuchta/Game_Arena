@@ -97,7 +97,7 @@ public class GameMechanic {
         while (true) {
         if(computerPlay) {
             heroSet = ((int)(Math.random() * heroes.length + 1));
-            heroSet = 2;
+//            heroSet = 4;
         } else {
             heroChooseText();
             while (!scanner.hasNextInt()) {
@@ -200,7 +200,6 @@ public class GameMechanic {
 
         while (true) {
 
-
             if(this.attacked) {
                 System.out.println("\n\t");
                 System.out.println(attacker.colorYellow + "\t\t\t" + attacker.getClass().getSimpleName() + " " + attacker.getName() + " turn: \n" + attacker.colorReset);
@@ -222,13 +221,17 @@ public class GameMechanic {
                 attacker.setMana(attacker.getMana() - attacker.getManaCost());
                 attacker.setEnergy(attacker.getEnergy() - attacker.getEnergyCost());
                 attacker.setRage(attacker.getRage() - attacker.getRageCost());
+                attacker.setDefenderHealth(defender.getHealth());
+                attacker.setDefenderMaxHealth(defender.getMaxHealth());
+                attacker.setDefenderDotStacks(defender.getDotStacksCount()[0],defender.getDefenderDotStacks()[1]);
 
                 //damage
-                int totalDamage = attacker.getTotalDamage();
-                int totalDamageAfterAbsorb /*= 0*/;
+                int totalDamage = 0;
+                int damageWithoutDot = attacker.getTotalDamage();
+                int totalDamageAfterAbsorb;
                 int totalAbsorb = defender.getAbsorbDamage() + defender.getAbsorbDamageBonus();
                 int absorbDamageBonus = defender.getAbsorbDamageBonus();
-                int absorbDamageBonusIncrease = attacker.getAbsorbDamageBonusIncrease();
+//                int absorbDamageBonusIncrease = attacker.getAbsorbDamageBonusIncrease();
                 int weaponDamage = 0;
 
                 //damage over time
@@ -256,25 +259,24 @@ public class GameMechanic {
                 //Critical hit double total damage.
                 boolean isCriticalHit = attacker.criticalHit();
                 if (isCriticalHit) {
-                    totalDamage *= 2;
+                    damageWithoutDot *= 2;
                 }
                 //Hunter kill shot double damage
                 if (attacker instanceof Hunter && attacker.getWhichAbilityWasUsed() == 3 && (double) (defender.getMaxHealth() / 100) * 20 > defender.getHealth()) {
-                    totalDamage *= 2;
+                    damageWithoutDot *= 2;
                 }
                 //Warrior double damage
                 if (attacker instanceof Warrior && (double) (defender.getMaxHealth() / 100) * 20 > defender.getHealth() && attacker.getRage() > 70) {
-                    totalDamage *= 2;
+                    damageWithoutDot *= 2;
                 }
 
                 //Paladin heal
                 if (attacker instanceof Paladin && attacker.getWhichAbilityWasUsed() == 4) {
-                    int[] paladinHealAndCleanse = ((Paladin) attacker).paladinHealAndCleanse(attacker.getHealth(), defender.getTotalDamageOverTime()[0], defender.getDotStacksCount()[0], attacker.getName());
-                    int[] paladinHealAndCleanse1 = ((Paladin) attacker).paladinHealAndCleanse(attacker.getHealth(), defender.getTotalDamageOverTime()[1], defender.getDotStacksCount()[1], attacker.getName());
+                    int[] paladinHealAndCleanse = ((Paladin) attacker).healAndCleanse(attacker.getHealth(), defender.getTotalDamageOverTime()[0], defender.getDotStacksCount()[0]);
+                    int[] paladinHealAndCleanse1 = ((Paladin) attacker).healAndCleanse(attacker.getHealth(), defender.getTotalDamageOverTime()[1], defender.getDotStacksCount()[1]);
                     healthRestore += paladinHealAndCleanse[0];
                     defender.setTotalDamageOverTime((defender.getTotalDamageOverTime()[0] - paladinHealAndCleanse[1]), (defender.getTotalDamageOverTime()[1] - paladinHealAndCleanse1[1]));
                     defender.setDotStacksCount(paladinHealAndCleanse[2], paladinHealAndCleanse[2]);
-
                 }
 
                 //Damage over time
@@ -298,7 +300,7 @@ public class GameMechanic {
                     dotCountTick[1]++;
                 }
 
-                totalDamage += totalDamageOverTime[0] + totalDamageOverTime[1];
+                totalDamage += totalDamageOverTime[0] + totalDamageOverTime[1] + damageWithoutDot;
 
                 //Damage dealt
                 if (attacker.isWeaponAttack()) {
@@ -322,15 +324,15 @@ public class GameMechanic {
                 //Warlock shield mana drain
                 if (defender instanceof Warlock && absorbDamageBonus != 0 && (absorbDamageBonus - totalDamage) <= 0) {
                     int manaBurnAfterDestroyShield = ((Warlock) defender).manaDrainFromShield(attacker.getMana(), attacker.getName(), defender.getName());
-                    attacker.statsRestoreValue(0, 0, -manaBurnAfterDestroyShield, 0);
+                    attacker.statsRestoreValue(0, 0, -manaBurnAfterDestroyShield);
                 }
 
                 //defender health calculator
-                totalDamageAfterAbsorb = gameMechanicMethods.damageDeal(totalDamage, totalAbsorb, isCriticalHit, attacker.getTotalDamage());
-                gameMechanicMethods.damageOverTimeTextOutput(attacker.getTotalDamage(),abilityUsed);
-                gameMechanicMethods.damageOverTimeTextOutput(weaponDamage,weapon.getClass().getSimpleName());
-                gameMechanicMethods.damageOverTimeTextOutput(damageAndStacksOverTime1[0],attacker.getDamageOverTimeAbilityName()[0]);
-                gameMechanicMethods.damageOverTimeTextOutput(damageAndStacksOverTime2[0],attacker.getDamageOverTimeAbilityName()[1]);
+                totalDamageAfterAbsorb = gameMechanicMethods.damageDeal(totalDamage, totalAbsorb);
+                gameMechanicMethods.damageOverTimeTextOutput(damageWithoutDot,abilityUsed, isCriticalHit);
+                gameMechanicMethods.damageOverTimeTextOutput(weaponDamage,weapon.getClass().getSimpleName(),false);
+                gameMechanicMethods.damageOverTimeTextOutput(damageAndStacksOverTime1[0],attacker.getDamageOverTimeAbilityName()[0],false);
+                gameMechanicMethods.damageOverTimeTextOutput(damageAndStacksOverTime2[0],attacker.getDamageOverTimeAbilityName()[1],false);
 
                 //defender absorb damage calculator
                 absorbDamageBonus = gameMechanicMethods.absorbDamageBonus(absorbDamageBonus, totalDamage, totalAbsorb);
@@ -343,12 +345,6 @@ public class GameMechanic {
                 //Dot life steal
                 if (attacker.isDotLifeSteal()) {
                     healthRestore += damageAndStacksOverTime1[0] / 10;
-                }
-
-                //Absorb damage increase
-                if (attacker.getAbsorbDamageBonusIncrease() != 0) {
-//                    System.out.println("\t" + attacker.getName() + " increase absorb by " + attacker.getAbsorbDamageBonusIncrease());
-                    absorbDamageBonusIncrease = gameMechanicMethods.absorbDamageBonusIncrease(attacker.getAbsorbDamageBonus(), absorbDamageBonusIncrease);
                 }
 
                 //Mana steal
@@ -369,7 +365,7 @@ public class GameMechanic {
 
                 //Stats changer
                 defender.damageAndStatsTakenValue(totalDamageAfterAbsorb, energyDrain, manaDrain, absorbDamageBonus);
-                attacker.statsRestoreValue(healthRestore, energyRestore, manaRestore, absorbDamageBonusIncrease);
+                attacker.statsRestoreValue(healthRestore, energyRestore, manaRestore);
 
                 //Damage over time stacks remove after 4 rounds
                 for (int i = 0; i < totalDamageOverTime.length; i++) {
@@ -379,7 +375,7 @@ public class GameMechanic {
                     }
                 }
 
-                System.out.println("------------------------------------------------------------------------------------------------");
+                System.out.println("--------------------------------------------------------------------------------------------------");
                 attacker.setCountDotTick(dotCountTick[0], dotCountTick[1], dotCountTick[2]);
                 attacker.setTotalDamageOverTime(totalDamageOverTime[0], totalDamageOverTime[1]);
                 attacker.setDotStacksCount(dotStacksCount[0], dotStacksCount[1]);
@@ -412,7 +408,7 @@ public class GameMechanic {
             if (playerHero.getHealth() <= 0 || computerHero.getHealth() <= 0) {
                 break;
             } else {
-                playerDamageDeal(playerHero, computerHero, playerWeapon,false);
+                playerDamageDeal(playerHero, computerHero, playerWeapon,true);
                 playerHero.manaAndEnergyRegeneration();
             }
 
